@@ -1,77 +1,98 @@
-ARG php_version=7.0
-FROM php:${php_version}-fpm
+FROM php:7.0-fpm
 
-LABEL maintainer="Ryan Gellis <ryan.gellis@rmgmedia.com>"
+# Prevents error messages related to using non tty terminal
+ARG DEBIAN_FRONTEND=noninteractive
+# Prevents error message when piping gpg key into apt-get
+ARG APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1
 
-# Install Base Packages
-RUN apt-get update && apt-get install -y \
-  apt-transport-https \
-  apt-utils \
-  git \
-  gnupg \
-  libcurl3-dev \
-  libfreetype6-dev \
-  libjpeg-dev \
-  libmcrypt-dev \
-  libpng-dev \
-  libxml2-dev \
-  libxslt-dev \
-  openssh-client \
-  zlib1g-dev
-  
-# Install PHP Extensions
+# Increment to force a new build
+ARG BUILD=1
+
+LABEL maintainer1="Kirk Madera <kirk.madera@rmgmedia.com>" \
+  maintainer2="Matthew Feinberg <matthew.feinberg@rmgmedia.com>" \
+  maintainer3="Valentin Peralta <valentin.peralta@rmgmedia.com>"
+
+## Install apt related packages
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+    # Prevents error message "debconf: delaying package configuration, since apt-utils is not installed"
+    apt-utils \
+    # Required for "apt-key add" to work
+    gnupg2 \
+  && rm -rf /var/lib/apt/lists/*
+
+# Add Blackfire repo
+RUN curl https://packages.blackfire.io/gpg.key | apt-key add - \
+    && echo "deb http://packages.blackfire.io/debian any main" | tee /etc/apt/sources.list.d/blackfire.list
+
+## Install packages
+RUN apt-get update \
+  && apt-get install -y \
+    blackfire-php \
+    cron \
+    # Required for hirak/prestissimo Composer plugin installation
+    git \
+    # Required for gd PHP extension
+    libfreetype6-dev \
+    # Required for gd PHP extension
+    libjpeg-dev \
+    # Required for mcrypt
+    libmcrypt-dev \
+    # Required for gd PHP extension
+    libpng-dev \
+    # Required for xsl PHP extension
+    libxslt-dev \
+    # Required for soap PHP extension
+    libxml2-dev \
+    nano \
+    # Installs redis-cli
+    redis-tools \
+    # Required for hirak/prestissimo Composer plugin installation
+    unzip \
+    # Required for Composer installation && hirak/prestissimo Composer plugin installation
+    wget \
+    # Required for zip PHP extension
+    zlib1g-dev \
+  && rm -rf /var/lib/apt/lists/*
+
+# Install and configure PHP Extensions
 RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/lib \
-  && docker-php-ext-install bcmath ctype curl dom fileinfo gd iconv intl json \
-  && docker-php-ext-install mbstring mcrypt opcache pdo_mysql posix simplexml \
-  && docker-php-ext-install soap tokenizer xml xmlwriter xsl zip 
+  && docker-php-ext-install \
+    bcmath \
+    gd \
+    # Produces warning: 'uidna_IDNToASCII_57' is deprecated
+    # and warning: inline function 'grapheme_memrchr_grapheme' declared but never defined
+    intl \
+    mcrypt \
+    opcache \
+    # Required for Conductor to run parallel asset upload/download
+    pcntl \
+    pdo_mysql \
+    soap \
+    xsl \
+    # zip ext produces warning: implicit declaration of function 'getpid'
+    zip
 
-# xdebug comes from pecl
-RUN pecl install xdebug-2.6.0
+# Install Xdebug
+RUN pecl install xdebug-2.7.2
 
-# zlib has a broken bit - workaround https://github.com/docker-library/php/issues/233#issuecomment-288727629
-RUN docker-php-ext-install zlib; exit 0
-RUN cp /usr/src/php/ext/zlib/config0.m4 /usr/src/php/ext/zlib/config.m4
-RUN docker-php-ext-install zlib
+# Configure PHP defaults
+COPY php.ini /usr/local/etc/php/php.ini
+COPY conf.d /usr/local/etc/php/conf.d
 
-
-# Configure PHP
-COPY config/php.ini /usr/local/etc/php/php.ini
-  
-# Node Setup
-RUN curl -sS https://deb.nodesource.com/setup_10.x | bash
-RUN apt-get install -y nodejs
-
-# Gulp setup
-RUN npm install --global gulp-cli
-
-# Yarn Setup
-RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
-RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
-RUN apt-get update && apt-get install --no-install-recommends yarn  
-  
-# Cleanup
-RUN rm -rf /var/lib/apt/lists/*
-
-# Ioncube what a pain
-WORKDIR /root/
-RUN curl -sS https://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz -o ioncube_loader.tgz
-RUN tar -zxvf ioncube_loader.tgz
-WORKDIR /root/ioncube
-RUN cp ioncube_loader_lin_7.0.so /usr/local/lib/php/extensions/no-debug-non-zts-20151012/ioncube_loader_lin_7.0.so
-WORKDIR /root/
-RUN rm -rf ioncube*
+# Install Composer
+COPY install-composer.sh /tmp
+RUN bash /tmp/install-composer.sh && rm /tmp/install-composer.sh
 
 # Setup webuser
-RUN useradd -d /home/webuser -m -u 800 webuser
+RUN groupadd -r -g 1000 nginx \
+ && useradd -d /home/webuser -m -u 800 -g nginx -s /bin/bash webuser
 
-# Switch to Webuser
-USER webuser
 WORKDIR /home/webuser
+COPY --chown=webuser:nginx home .
+RUN echo "export PATH=\$HOME/bin/robofirm:\$HOME/bin/robofirm/vendor/bin:\$PATH >> .bashrc"
 
-# Install composer
-RUN curl -sS https://getcomposer.org/installer -o composer-setup.php && php composer-setup.php --install-dir=/home/webuser/ --filename=composer
-RUN rm -f composer-setup.php
+USER webuser
 
-RUN echo "alias conductor=/home/webuser/conductor/vendor/bin/conductor" >> /home/webuser/.bashrc
-RUN echo "alias composer=/home/webuser/composer" >> /home/webuser/.bashrc
-
+# Install hirak/prestissimo Composer plugin for webuser
+RUN composer global require hirak/prestissimo
