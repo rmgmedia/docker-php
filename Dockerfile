@@ -102,3 +102,6 @@ USER webuser
 
 # Install hirak/prestissimo Composer plugin for webuser
 RUN composer global require hirak/prestissimo
+
+# Switch back to root
+USER root
