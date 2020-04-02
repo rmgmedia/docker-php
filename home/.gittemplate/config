@@ -1,0 +1,8 @@
+[core]
+    filemode = false
+[color]
+    ui = true
+[pull]
+    default = current
+[push]
+    default = simple

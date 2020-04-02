@@ -1,14 +1,2 @@
-[color]
-ui = true
-
-[core]
-filemode = false
-
-[push]
-default = simple
-
-[pull]
-default = current
-
 [init]
-templatedir = /home/webuser/bin/robofirm/git-template
+templatedir = /home/webuser/.gittemplate
