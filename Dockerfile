@@ -1,4 +1,4 @@
-FROM php:7.2-fpm
+FROM php:7.3-fpm
 
 # Prevents error messages related to using non tty terminal
 ARG DEBIAN_FRONTEND=noninteractive
@@ -44,6 +44,8 @@ RUN apt-get update \
     libxslt-dev \
     # Required for soap PHP extension
     libxml2-dev \
+    # Required for zip PHP extension
+    libzip-dev \
     mariadb-client \
     mydumper \
     nano \
