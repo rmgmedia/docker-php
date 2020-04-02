@@ -93,6 +93,17 @@ COPY conf.d /usr/local/etc/php/conf.d
 COPY install-composer.sh /tmp
 RUN bash /tmp/install-composer.sh && rm /tmp/install-composer.sh
 
+## Set up n98-magerun and n98-magerun2
+WORKDIR /usr/local/bin
+RUN curl -O https://files.magerun.net/n98-magerun.phar \
+  && ln -s n98-magerun.phar n98-magerun \
+  && chmod +x n98-magerun.phar \
+  && curl -o /etc/bash_completion.d/n98-magerun.phar.bash https://raw.githubusercontent.com/netz98/n98-magerun/develop/res/autocompletion/bash/n98-magerun.phar.bash \
+  && curl -O https://files.magerun.net/n98-magerun2.phar \
+  && ln -s n98-magerun2.phar n98-magerun2 \
+  && chmod +x n98-magerun2.phar \
+  && curl -o /etc/bash_completion.d/n98-magerun2.phar.bash https://raw.githubusercontent.com/netz98/n98-magerun2/develop/res/autocompletion/bash/n98-magerun2.phar.bash
+
 # Setup webuser
 RUN groupadd -r -g 800 nginx \
  && useradd -d /home/webuser -m -u 1000 -g nginx -s /bin/bash webuser
