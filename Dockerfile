@@ -104,18 +104,19 @@ RUN curl -O https://files.magerun.net/n98-magerun.phar \
   && chmod +x n98-magerun2.phar \
   && curl -o /etc/bash_completion.d/n98-magerun2.phar.bash https://raw.githubusercontent.com/netz98/n98-magerun2/develop/res/autocompletion/bash/n98-magerun2.phar.bash
 
-# Setup webuser
+## Setup webuser
 RUN groupadd -r -g 800 nginx \
  && useradd -d /home/webuser -m -u 1000 -g nginx -s /bin/bash webuser
-
-WORKDIR /home/webuser
 COPY --chown=webuser:nginx home .
-RUN echo "export PATH=\$HOME/bin/robofirm:\$HOME/bin/robofirm/vendor/bin:\$PATH >> .bashrc"
 
 USER webuser
+WORKDIR /home/webuser
 
 # Install hirak/prestissimo Composer plugin for webuser
 RUN composer global require hirak/prestissimo
+
+# Set up webuser path
+RUN echo "export PATH=\$HOME/bin/robofirm:\$HOME/bin/robofirm/vendor/bin:\$PATH >> .bashrc"
 
 # Switch back to root
 USER root
