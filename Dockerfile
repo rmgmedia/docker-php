@@ -93,8 +93,8 @@ COPY install-composer.sh /tmp
 RUN bash /tmp/install-composer.sh && rm /tmp/install-composer.sh
 
 # Setup webuser
-RUN groupadd -r -g 1000 nginx \
- && useradd -d /home/webuser -m -u 800 -g nginx -s /bin/bash webuser
+RUN groupadd -r -g 800 nginx \
+ && useradd -d /home/webuser -m -u 1000 -g nginx -s /bin/bash webuser
 
 WORKDIR /home/webuser
 COPY --chown=webuser:nginx home .
