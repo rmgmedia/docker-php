@@ -112,9 +112,6 @@ WORKDIR /home/webuser
 # Install hirak/prestissimo Composer plugin for webuser
 RUN composer global require hirak/prestissimo
 
-# Set up webuser path
-RUN echo "export PATH=\$HOME/bin/robofirm:\$HOME/bin/robofirm/vendor/bin:\$PATH" >> .bashrc
-
 # Switch back to root
 USER root
 WORKDIR /root
