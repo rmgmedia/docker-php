@@ -28,10 +28,12 @@ RUN curl https://packages.blackfire.io/gpg.key | apt-key add - \
 ## Install packages
 RUN apt-get update \
   && apt-get install -y \
+    bash-completion \
     blackfire-php \
     cron \
     # Required for hirak/prestissimo Composer plugin installation
     git \
+    htop \
     # Required for gd PHP extension
     libfreetype6-dev \
     # Required for gd PHP extension
@@ -42,15 +44,22 @@ RUN apt-get update \
     libxslt-dev \
     # Required for soap PHP extension
     libxml2-dev \
+    mariadb-client \
+    mydumper \
     nano \
+    openssh-client \
     # Installs redis-cli
     redis-tools \
+    telnet \
+    tig \
     # Required for hirak/prestissimo Composer plugin installation
     unzip \
+    vim \
     # Required for Composer installation && hirak/prestissimo Composer plugin installation
     wget \
     # Required for zip PHP extension
     zlib1g-dev \
+    zip \
   && rm -rf /var/lib/apt/lists/*
 
 # Install and configure PHP Extensions
