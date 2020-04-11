@@ -78,6 +78,9 @@ RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-di
     pcntl \
     pdo_mysql \
     soap \
+    # Required by php-amqplib/php-amqplib package which is still in use by Conductor
+    # Also required for magento/ece-tools related to Magento Cloud
+    sockets \
     xsl \
     # zip ext produces warning: implicit declaration of function 'getpid'
     zip
