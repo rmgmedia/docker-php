@@ -1,4 +1,4 @@
-FROM php:7.0-fpm
+FROM php:5.6-fpm
 
 # Prevents error messages related to using non tty terminal
 ARG DEBIAN_FRONTEND=noninteractive
@@ -86,7 +86,7 @@ RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-di
     zip
 
 # Install Xdebug
-RUN pecl install xdebug-2.7.2
+RUN pecl install xdebug-2.5.5
 
 # Configure PHP defaults
 COPY php.ini /usr/local/etc/php/php.ini
@@ -96,16 +96,12 @@ COPY conf.d /usr/local/etc/php/conf.d
 COPY install-composer.sh /tmp
 RUN bash /tmp/install-composer.sh && rm /tmp/install-composer.sh
 
-## Set up n98-magerun and n98-magerun2
+## Set up n98-magerun
 WORKDIR /usr/local/bin
 RUN curl -O https://files.magerun.net/n98-magerun.phar \
   && ln -s n98-magerun.phar n98-magerun \
   && chmod +x n98-magerun.phar \
-  && curl -o /etc/bash_completion.d/n98-magerun.phar.bash https://raw.githubusercontent.com/netz98/n98-magerun/develop/res/autocompletion/bash/n98-magerun.phar.bash \
-  && curl -O https://files.magerun.net/n98-magerun2.phar \
-  && ln -s n98-magerun2.phar n98-magerun2 \
-  && chmod +x n98-magerun2.phar \
-  && curl -o /etc/bash_completion.d/n98-magerun2.phar.bash https://raw.githubusercontent.com/netz98/n98-magerun2/develop/res/autocompletion/bash/n98-magerun2.phar.bash
+  && curl -o /etc/bash_completion.d/n98-magerun.phar.bash https://raw.githubusercontent.com/netz98/n98-magerun/develop/res/autocompletion/bash/n98-magerun.phar.bash
 
 ## Setup webuser
 RUN groupadd -r -g 800 nginx \
