@@ -91,7 +91,7 @@ RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-di
 RUN pecl install xdebug-2.5.5
 
 # Configure PHP defaults
-COPY php.ini /usr/local/etc/php/php.ini
+RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 COPY conf.d /usr/local/etc/php/conf.d
 
 # Set up mail command to run through msmtp, by default
