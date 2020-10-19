@@ -5,12 +5,6 @@ This image is an extension of the official PHP image, opinionated for RMG Media 
 ## Environment variables
 The following environment variables should be set when running this image: 
 
-### Blackfire
-The blackfire cli client will use these credentials.
-
-* BLACKFIRE_CLIENT_ID
-* BLACKFIRE_CLIENT_TOKEN
-
 ### Outbound Email via MSMTP
 
 * MSMTP_HOST - SMTP relay host
@@ -31,7 +25,7 @@ cp .env.dist .env
 #### Build & Run
 
 ```bash
-TAG=rmgmedia/php:7.4
+TAG=rmgmedia/php:7.4-fpm
 docker build --tag "$TAG" .
 CONTAINER_ID=$(docker run --env-file .env --rm -d "$TAG")
 ```
