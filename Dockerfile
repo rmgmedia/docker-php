@@ -47,6 +47,8 @@ RUN apt-get update \
     # Required for zip PHP extension
     libzip-dev \
     mariadb-client \
+    # MSMTP for sending outbound email
+    msmtp-mta \
     mydumper \
     nano \
     openssh-client \
@@ -88,23 +90,22 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
 RUN pecl install xdebug-2.9.4
 
 # Configure PHP defaults
-COPY php.ini /usr/local/etc/php/php.ini
+RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 COPY conf.d /usr/local/etc/php/conf.d
+
+# Set up mail command to run through msmtp, by default
+COPY etc/mail.rc /etc/mail.rc
 
 # Install Composer
 COPY install-composer.sh /tmp
 RUN bash /tmp/install-composer.sh && rm /tmp/install-composer.sh
 
-## Set up n98-magerun and n98-magerun2
+## Set up n98-magerun
 WORKDIR /usr/local/bin
 RUN curl -O https://files.magerun.net/n98-magerun.phar \
   && ln -s n98-magerun.phar n98-magerun \
   && chmod +x n98-magerun.phar \
-  && curl -o /etc/bash_completion.d/n98-magerun.phar.bash https://raw.githubusercontent.com/netz98/n98-magerun/develop/res/autocompletion/bash/n98-magerun.phar.bash \
-  && curl -O https://files.magerun.net/n98-magerun2.phar \
-  && ln -s n98-magerun2.phar n98-magerun2 \
-  && chmod +x n98-magerun2.phar \
-  && curl -o /etc/bash_completion.d/n98-magerun2.phar.bash https://raw.githubusercontent.com/netz98/n98-magerun2/develop/res/autocompletion/bash/n98-magerun2.phar.bash
+  && curl -o /etc/bash_completion.d/n98-magerun.phar.bash https://raw.githubusercontent.com/netz98/n98-magerun/develop/res/autocompletion/bash/n98-magerun.phar.bash
 
 ## Setup webuser
 RUN groupadd -r -g 800 nginx \
@@ -120,3 +121,9 @@ RUN composer global require hirak/prestissimo
 # Switch back to root
 USER root
 WORKDIR /root
+COPY --chown=root:root home .
+
+# Set up entrypoint
+COPY docker-entrypoint.sh /usr/local/bin
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+ENTRYPOINT [ "docker-entrypoint.sh" ]
