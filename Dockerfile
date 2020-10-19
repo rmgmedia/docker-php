@@ -47,6 +47,8 @@ RUN apt-get update \
     # Required for soap PHP extension
     libxml2-dev \
     mariadb-client \
+    # MSMTP for sending outbound email
+    msmtp-mta \
     mydumper \
     nano \
     openssh-client \
@@ -92,6 +94,9 @@ RUN pecl install xdebug-2.5.5
 COPY php.ini /usr/local/etc/php/php.ini
 COPY conf.d /usr/local/etc/php/conf.d
 
+# Set up mail command to run through msmtp, by default
+COPY etc/mail.rc /etc/mail.rc
+
 # Install Composer
 COPY install-composer.sh /tmp
 RUN bash /tmp/install-composer.sh && rm /tmp/install-composer.sh
@@ -117,3 +122,9 @@ RUN composer global require hirak/prestissimo
 # Switch back to root
 USER root
 WORKDIR /root
+COPY --chown=root:root home .
+
+# Set up entrypoint
+COPY docker-entrypoint.sh /usr/local/bin
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+ENTRYPOINT [ "docker-entrypoint.sh" ]
