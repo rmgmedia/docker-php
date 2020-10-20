@@ -1,4 +1,4 @@
-FROM php:7.2-cli
+FROM php:7.3-cli
 
 # Prevents error messages related to using non tty terminal
 ARG DEBIAN_FRONTEND=noninteractive
@@ -44,6 +44,8 @@ RUN apt-get update \
     libxslt-dev \
     # Required for soap PHP extension
     libxml2-dev \
+    # Required for zip PHP extension
+    libzip-dev \
     mariadb-client \
     # MSMTP for sending outbound email
     msmtp-mta \
