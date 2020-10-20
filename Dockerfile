@@ -1,4 +1,4 @@
-FROM php:7.3-cli
+FROM php:7.4-cli
 
 # Prevents error messages related to using non tty terminal
 ARG DEBIAN_FRONTEND=noninteractive
@@ -67,7 +67,7 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 
 # Install and configure PHP Extensions
-RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/lib \
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
   && docker-php-ext-install \
     bcmath \
     gd \
