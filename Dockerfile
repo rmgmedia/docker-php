@@ -1,4 +1,4 @@
-FROM php:7.1-cli
+FROM php:7.2-cli
 
 # Prevents error messages related to using non tty terminal
 ARG DEBIAN_FRONTEND=noninteractive
@@ -38,8 +38,6 @@ RUN apt-get update \
     libfreetype6-dev \
     # Required for gd PHP extension
     libjpeg-dev \
-    # Required for mcrypt
-    libmcrypt-dev \
     # Required for gd PHP extension
     libpng-dev \
     # Required for xsl PHP extension
@@ -74,7 +72,6 @@ RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-di
     # Produces warning: 'uidna_IDNToASCII_57' is deprecated
     # and warning: inline function 'grapheme_memrchr_grapheme' declared but never defined
     intl \
-    mcrypt \
     opcache \
     # Required for Conductor to run parallel asset upload/download
     pcntl \
