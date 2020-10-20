@@ -1,4 +1,4 @@
-FROM php:5.6-fpm
+FROM php:5.6-cli
 
 # Prevents error messages related to using non tty terminal
 ARG DEBIAN_FRONTEND=noninteractive
@@ -111,20 +111,17 @@ RUN curl -O https://files.magerun.net/n98-magerun.phar \
 ## Setup webuser
 RUN groupadd -r -g 800 nginx \
  && useradd -d /home/webuser -m -u 1000 -g nginx -s /bin/bash webuser
-COPY --chown=webuser:nginx home .
-
+COPY --chown=webuser:nginx home /home/webuser
+RUN echo 'export PS1="\u@\h$ "' >> /home/webuser/.bashrc
 USER webuser
-WORKDIR /home/webuser
-
 # Install hirak/prestissimo Composer plugin for webuser
-RUN composer global require hirak/prestissimo
-
-# Switch back to root
+RUN composer global require hirak/prestissimo:^0.3.10
 USER root
-WORKDIR /root
-COPY --chown=root:root home .
 
 # Set up entrypoint
 COPY docker-entrypoint.sh /usr/local/bin
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 ENTRYPOINT [ "docker-entrypoint.sh" ]
+
+USER webuser
+WORKDIR /home/webuser
