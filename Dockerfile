@@ -113,9 +113,6 @@ COPY --chown=webuser:nginx home .
 USER webuser
 WORKDIR /home/webuser
 
-# Install hirak/prestissimo Composer plugin for webuser
-RUN composer global require hirak/prestissimo
-
 # Switch back to root
 USER root
 WORKDIR /root
