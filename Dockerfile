@@ -113,9 +113,8 @@ RUN groupadd -r -g 800 nginx \
  && useradd -d /home/webuser -m -u 1000 -g nginx -s /bin/bash webuser
 COPY --chown=webuser:nginx home /home/webuser
 RUN echo 'export PS1="\u@\h$ "' >> /home/webuser/.bashrc
-USER webuser
-# Install hirak/prestissimo Composer plugin for webuser
-RUN composer global require hirak/prestissimo:^0.3.10
+
+# Switch back to root
 USER root
 
 # Set up entrypoint
