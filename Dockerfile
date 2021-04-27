@@ -90,3 +90,6 @@ RUN chmod 0600 /home/www-data/.msmtprc
 COPY docker-entrypoint.sh /usr/local/bin
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 ENTRYPOINT [ "docker-entrypoint.sh" ]
+
+USER webuser
+WORKDIR /home/webuser

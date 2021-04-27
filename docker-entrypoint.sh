@@ -24,5 +24,6 @@ if [[ -v MSMTP_FROM ]]; then
   sed -i -r "s|MSMTP_FROM|${MSMTP_FROM/|/\\|}|g" "/home/www-data/.msmtprc"
 fi
 
-# Run entrypoint
-docker-php-entrypoint php-fpm
+# Do nothing. This will be used as a workspace.
+touch /tmp/test
+tail -f /tmp/test
