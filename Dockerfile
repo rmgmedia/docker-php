@@ -1,4 +1,4 @@
-FROM php:7.4-fpm
+FROM php:7.4
 
 # Prevents error messages related to using non tty terminal
 ARG DEBIAN_FRONTEND=noninteractive
