@@ -89,7 +89,7 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     zip
 
 # Install Xdebug
-RUN pecl install xdebug-2.9.4
+RUN pecl install xdebug
 
 # Configure PHP defaults
 RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
