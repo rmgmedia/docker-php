@@ -41,6 +41,8 @@ RUN apt-get update \
     libxml2-dev \
     # Required for zip PHP extension
     libzip-dev \
+    # Required to avoid error related to LC_ALL setting
+    locales-all \
     mariadb-client \
     # MSMTP for sending outbound email
     msmtp-mta \
