@@ -1,4 +1,4 @@
-FROM php:7.4-fpm
+FROM php:8.0-fpm
 
 # Prevents error messages related to using non tty terminal
 ARG DEBIAN_FRONTEND=noninteractive
@@ -72,7 +72,7 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     zip
 
 # Install Xdebug
-RUN pecl install xdebug-2.9.4
+RUN pecl install xdebug
 
 # Configure PHP defaults
 RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
