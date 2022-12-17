@@ -1,4 +1,4 @@
-FROM php:8.0
+FROM php:8.1
 
 # Prevents error messages related to using non tty terminal
 ARG DEBIAN_FRONTEND=noninteractive
