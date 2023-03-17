@@ -32,7 +32,7 @@ cp .env.dist .env
 
 ```bash
 TAG=rmgmedia/php:7.4
-docker build --tag "$TAG" .
+docker build --pull --tag "$TAG" .
 CONTAINER_ID=$(docker run --env-file .env --rm -d "$TAG")
 ```
 
